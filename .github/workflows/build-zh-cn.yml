@@ -1,0 +1,80 @@
+name: Build Simplified Chinese image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/build-zh-cn.yml"
+      - "Dockerfile"
+      - "docker_start.sh"
+      - "go.mod"
+      - "go.sum"
+      - "main.go"
+      - "package.json"
+      - "yarn.lock"
+      - "pkg/**"
+      - "ui/**"
+      - "xbvr_data/**"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Build localized UI
+        run: |
+          corepack enable
+          corepack yarn install --ignore-engines --frozen-lockfile
+          corepack yarn i18n:audit
+          corepack yarn build
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build Linux binary
+        shell: bash
+        run: |
+          VERSION="zh-CN-${GITHUB_SHA::7}"
+          BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          CGO_ENABLED=1 go build \
+            -tags=json1 \
+            -ldflags="-s -w -X main.version=${VERSION} -X main.commit=${GITHUB_SHA::7} -X main.date=${BUILD_DATE}" \
+            -o xbvr \
+            .
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:zh-cn
+            ghcr.io/${{ github.repository }}:zh-cn-${{ github.sha }}
