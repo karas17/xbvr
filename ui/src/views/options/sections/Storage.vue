@@ -94,7 +94,7 @@
         <h3 class="title">{{ $t('Add cloud storage') }}</h3>
         <b-field grouped>
           <b-field :label="$t('Service')">
-            <b-select placeholder="Select one" v-model="serviceSelected">
+            <b-select :placeholder="$t(`Select one`)" v-model="serviceSelected">
               <option v-for="option in serviceOpts" :value="option.id" :key="option.id">
                 {{ option.name }}
               </option>
@@ -118,27 +118,27 @@
     <h3 class="title">{{ $t('Options') }}</h3>
     <b-field>
       <b-switch v-model="match_ohash" type="is-default">
-        Match StashDB Hashes
+        {{ $t(`Match StashDB Hashes`) }}
       </b-switch>
     </b-field>
 
     <hr/>
 
-    <b-field label="Video File Extensions">
-      <b-tooltip label="Only add video file extensions!" position="is-top" style="width: 100%;">
+    <b-field :label="$t(`Video File Extensions`)">
+      <b-tooltip :label="$t(`Only add video file extensions!`)" position="is-top" style="width: 100%;">
         <b-taginput
             ref="videoExtInput"
             v-model="video_ext"
             :allow-new="true"
             @add="OnExtAdded"
             @remove="saveExtensions"
-            placeholder="Add a video extension (e.g. .mp4)">
+            :placeholder="$t(`Add a video extension (e.g. .mp4)`)">
         </b-taginput>
       </b-tooltip>
     </b-field>
     <b-field>
-      <b-tooltip label="This only resets the Video File Extensions list." position="is-right">
-        <b-button type="is-warning" @click="resetToDefaults">Reset</b-button>
+      <b-tooltip :label="$t(`This only resets the Video File Extensions list.`)" position="is-right">
+        <b-button type="is-warning" @click="resetToDefaults">{{ $t(`Reset`) }}</b-button>
       </b-tooltip>
     </b-field>
   </div>

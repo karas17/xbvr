@@ -150,7 +150,7 @@
           </b-field>
         </section>
         <footer class="modal-card-foot">
-          <button class="button is-primary" :disabled="this.additionalInfo[additionalInfoIdx].required && this.additionalInfo[additionalInfoIdx].fieldValue == ''" @click="taskScrapeSceneInfoEntered()">Continue
+          <button class="button is-primary" :disabled="this.additionalInfo[additionalInfoIdx].required && this.additionalInfo[additionalInfoIdx].fieldValue == ''" @click="taskScrapeSceneInfoEntered()">{{ $t(`Continue`) }}
           </button>
         </footer>
       </div>
